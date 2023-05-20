@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch and Graph CSV</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.min.js"></script>
+    <style>
+        .container{
+            width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    <canvas id="chart"></canvas>
+    </div>
+    <script>
+       const xs = [];
+       const ys = [];
+       chartIt();
+
+       async function chartIt() {
+        const data = await getData();
+        const ctx = document.getElementById('chart');
+        const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.xs,
+            datasets: [{
+            label: 'Combined Land-Surface Air and Sea-Surface Water Temperature in C degree', 
+            data: data.ys,
+            borderWidth: 1
+            }]
+        }
+        });
+    }
+
+
+        // Data from: https://data.giss.nasa.gov/gistemp/
+        // Mean from: https://earthobservatory.nasa.gov/world-of-
+    async function getData() {
+        // const response = await fetch('test.csv');
+           const response = await fetch('ZonAnn.Ts+dSST.csv');
+           const data = await response.text();
+           console.log(data);
+
+           const table = data.split('\n').slice(1);
+           table.forEach(row => {
+            const columns = row.split(',');
+            const year = columns[0];
+            xs.push(year);
+            const temp = columns[1];
+            ys.push(parseFloat(temp) + 14);
+            console.log(year, temp);
+           });
+           return {xs, ys};
+    }
+    </script>
+</body>
+</html>
